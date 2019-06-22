@@ -15,7 +15,9 @@ class CreateAppsTable extends Migration
     {
         Schema::create('apps', function (Blueprint $table) {
             $table->string('id')->unique();
-            $table->string('api_key');
+            $table->string('api_key')->unique();
+            $table->longText('allowed_ips')->nullable();
+            $table->string('salt')->nullable();
             $table->timestamps();
         });
     }
