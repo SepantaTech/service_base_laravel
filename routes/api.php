@@ -19,3 +19,7 @@ Route::get('ping', function(){
 
 // todo | uncomment
 // Route::get('register_app', 'RegistrationController@registerApp');
+
+\Illuminate\Support\Facades\Route::middleware(\App\Http\Middleware\AuthByAPIKey::class)->post('test', function(){
+    return 'hello';
+});
