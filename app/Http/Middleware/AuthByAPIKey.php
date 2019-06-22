@@ -39,6 +39,9 @@ class AuthByAPIKey
             abort(403);
         }
 
+        // set dynamic database connection
+        Assistance::setDynamicConnection($appInfo);
+
         // get user info
         if (!$user = Assistance::findUserByToken($token)) {
             abort(403, 'Wrong api key or token');
@@ -48,13 +51,11 @@ class AuthByAPIKey
         Assistance::setAppInfo($appInfo);
         Assistance::setUser($user);
 
-        // set dynamic database connection (Note: App dynamic database and tables must create after app registration)
-        $dbName = $appInfo['id'] . '_' . env('App_NAME_POSTFIX');
-        $mysqlConnectionConfig = config('database.connections.mysql');
-        $mysqlConnectionConfig['database'] = $dbName;
-        Config::set("database.connections.dynamic", $mysqlConnectionConfig);
 
         // continue
         return $next($request);
     }
+
+
+
 }

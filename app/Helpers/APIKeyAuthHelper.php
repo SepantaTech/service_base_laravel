@@ -10,6 +10,7 @@ namespace App\Helpers;
 
 
 use App\User;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 class APIKeyAuthHelper
@@ -64,4 +65,15 @@ class APIKeyAuthHelper
         define('APP_ID', $appInfo['id']);
     }
 
+    /**
+     * set dynamic database connection config
+     * @param $appInfo
+     */
+    public static function setDynamicConnection($appInfo){
+        $dbName = $appInfo['id'] . '_' . env('App_NAME_POSTFIX');
+        $mysqlConnectionConfig = config('database.connections.mysql');
+        $mysqlConnectionConfig['database'] = $dbName;
+        Config::set("database.connections.dynamic", $mysqlConnectionConfig);
+
+    }
  }
