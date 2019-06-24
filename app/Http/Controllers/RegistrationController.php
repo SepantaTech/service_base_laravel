@@ -14,7 +14,7 @@ class RegistrationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(AuthByAPIKey::class);
+        $this->middleware(AuthByAPIKey::class . ':1');
         $this->middleware(OnlyGamehubCDN::class);
     }
 
@@ -28,7 +28,7 @@ class RegistrationController extends Controller
                 'allowed_ips' => ['required'],
             ]);
 
-        } catch (ValidationException $exception){
+        } catch (ValidationException $exception) {
             return response([
                 'ok' => false,
                 'result' => null,
@@ -40,14 +40,15 @@ class RegistrationController extends Controller
         // get allowed ips
         $allowedIps = ((is_array($validInput['allowed_ips'])) ? $validInput['allowed_ips'] : [$validInput['allowed_ips']]);
         // validate ips
-        if(!count($allowedIps)) abort(400);
+        if (!count($allowedIps)) abort(400);
 
         foreach ($allowedIps as $ip)
             if (!is_string($ip))
                 abort(400);
 
-            //check if app already registered
+        //check if app already registered
         $appInfo = AppRegistrationHelper::getAppInfo($validInput['app_id']);
+
 
         if ($appInfo) return response([
             'ok' => false,
@@ -58,6 +59,7 @@ class RegistrationController extends Controller
 
         // register
         try {
+
             $registeredApp = new RegisteredApp;
             $registeredApp->salt = $validInput['salt'];
             $registeredApp->id = $validInput['app_id'];
@@ -65,7 +67,14 @@ class RegistrationController extends Controller
             $registeredApp->api_key = Hash::make(json_encode($registeredApp));
             $registeredApp = AppRegistrationHelper::saveApp($registeredApp);
 
-        } catch (\Exception $exception){
+            // todo create dynamic database
+
+            $createDBResult = AppRegistrationHelper::createDynamicDatabases($registeredApp);
+
+        } catch (\Exception $exception) {
+            // remove registered app
+            $registeredApp->delete();
+
             return response([
                 'result' => null,
                 'ok' => false,
@@ -73,8 +82,6 @@ class RegistrationController extends Controller
                 'description' => 'Failed on save',
             ]);
         }
-
-        // todo create dynamic database
 
 
         return response([

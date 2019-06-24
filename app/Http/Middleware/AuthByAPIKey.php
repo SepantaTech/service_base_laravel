@@ -17,7 +17,7 @@ class AuthByAPIKey
      * @param  \Closure $next
      * @return mixed
      */
-    public function handle(\Illuminate\Http\Request $request, Closure $next)
+    public function handle(\Illuminate\Http\Request $request, Closure $next, $quest = 0)
     {
         // validate api key
         $headers = getallheaders();
@@ -34,22 +34,31 @@ class AuthByAPIKey
             abort(403, 'Wrong api key');
         }
 
-        //  validate token
-        if (!$token = $request->header('token', false)) {
-            abort(403);
+        if(!$quest) {
+            //  validate token
+            if (!$token = $request->header('token', false)) {
+                abort(403);
+            }
         }
 
         // set dynamic database connection
         Assistance::setDynamicConnection($appInfo);
 
-        // get user info
-        if (!$user = Assistance::findUserByToken($token, $apiKey)) {
-            abort(403, 'Wrong token');
+        if(!$quest) {
+            // get user info
+            if (!$user = Assistance::findUserByToken($token, $apiKey)) {
+                abort(403, 'Wrong token');
+            }
         }
 
         // set api info and user info
         Assistance::setAppInfo($appInfo);
-        Assistance::setUser($user);
+        if(!$quest) {
+            define('GUEST', false);
+            Assistance::setUser($user);
+        } {
+            define('GUEST', true);
+        }
 
 
         // continue
