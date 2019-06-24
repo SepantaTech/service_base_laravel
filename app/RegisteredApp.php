@@ -10,5 +10,15 @@ class RegisteredApp extends Model
     
     protected $casts = [
         'allowed_ips' => 'array',
+        'id' => 'string',
     ];
+
+    public function getIdAttribute(){
+        if(isset($this->attributes['id'])){
+            return $this->attributes['id'];
+        }
+        return null;
+    }
+
+    public $incrementing = false;
 }
