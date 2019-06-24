@@ -31,7 +31,7 @@ class AuthByAPIKey
         */
         // find api key or abort on fail
         if (!$appInfo = Assistance::findAppInfo($apiKey)) {
-            abort(403, 'Wrong api key or token');
+            abort(403, 'Wrong api key');
         }
 
         //  validate token
@@ -43,8 +43,8 @@ class AuthByAPIKey
         Assistance::setDynamicConnection($appInfo);
 
         // get user info
-        if (!$user = Assistance::findUserByToken($token)) {
-            abort(403, 'Wrong api key or token');
+        if (!$user = Assistance::findUserByToken($token, $apiKey)) {
+            abort(403, 'Wrong token');
         }
 
         // set api info and user info
