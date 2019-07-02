@@ -4,9 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\APIKeyAuthHelper as Assistance;
 use Closure;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpFoundation\HeaderBag;
+
 
 class AuthByAPIKey
 {
@@ -37,7 +35,7 @@ class AuthByAPIKey
         if(!$quest) {
             //  validate token
             if (!$token = $request->header('token', false)) {
-                abort(403);
+                abort(403, 'Token not found');
             }
         }
 
@@ -56,7 +54,7 @@ class AuthByAPIKey
         if(!$quest) {
             define('GUEST', false);
             Assistance::setUser($user);
-        } {
+        } else {
             define('GUEST', true);
         }
 
