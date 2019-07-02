@@ -19,7 +19,7 @@ class APIKeyAuthHelper
     /**
      * Find app info by it's api key and return array of info
      * @param $apiKey
-     * @return bool
+     * @return
      */
     public static function findAppInfo($apiKey)
     {
